@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class SpawnerGround : MonoBehaviour
 {
-
-    public Transform[] spawnPoints;  // Array of spawn points to be used.
-    public GameObject[] enemyPrefabs; // Array of different Enemies that are used.
-    public int amountEnemies;  // Total number of enemies to spawn.
+    public Transform[] spawnPoints;  // Массив точек спауна.
+    public GameObject[] enemyPrefabs; // Массив разных врагов.
+    public int amountEnemies;  // Общее количество врагов для спауна.
     private int i;
+
+    public float noiseScale = 0.1f; // Масштаб шума, чтобы контролировать плотность объектов.
 
     void Start()
     {
@@ -18,18 +19,19 @@ public class SpawnerGround : MonoBehaviour
 
     public void Spawn()
     {
+        float offsetX = 0f;
+        float offsetY = 0f;
 
-        int k = 1;
-        for (i = 0; i < amountEnemies; i++) // How many enemies to instantiate total.
+        for (i = 0; i < amountEnemies; i++) // Сколько врагов нужно заспаунить.
         {
+            GameObject obj = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)]; // Рандомизация врагов.
 
-            GameObject obj = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)]; // Randomize the different enemies to instantiate.
+            // Используем Perlin Noise для плавных переходов по осям X и Y.
+            offsetX = Mathf.PerlinNoise(i * noiseScale, 0f) * 20f - 10f; // Плавное изменение по X.
+            offsetY = Mathf.PerlinNoise(0f, i * noiseScale) * 6f - 3f; // Плавное изменение по Y.
 
-            //Instantiate(obj, new Vector3((-9.5f + 0.14f * i)%9.535f, -3.5f + k * 0.07f, 0), Quaternion.Euler(0f, 0f, 0f));
-            Instantiate(obj, new Vector3((0.14f * (i % 138)) - 9.6f, -3.5f + k * 0.07f, 0), Quaternion.Euler(0f, 0f, 0f));
-            if (i % 138 == 0 && i != 0)
-                k = k + 2;
-
+            // Создаем врага с плавным смещением.
+            Instantiate(obj, new Vector3(offsetX, offsetY, 0), Quaternion.Euler(0f, 0f, 0f));
         }
     }
 

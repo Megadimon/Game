@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class HeroMove : MonoBehaviour
 {
+    [SerializeField] private bool PowerOfTankUnlim = false;
 
     public float _moveSpeed;
     public int HP;
@@ -19,15 +20,15 @@ public class HeroMove : MonoBehaviour
 
     public void Move()
     {
-        if (power >= 0)
+        if (power >= 0 || PowerOfTankUnlim)
         {
-            float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveHorizontal = Input.GetAxisRaw("Horizontal");
             if (moveHorizontal * _moveSpeed > 0)
                 power = power - moveHorizontal * _moveSpeed;
             else
                 power = power + moveHorizontal * _moveSpeed;
             Fuel.value = power;
-            var movement = new Vector3(moveHorizontal * _moveSpeed + this.transform.position.x, this.transform.position.y, 0);
+            var movement = new Vector3(moveHorizontal * _moveSpeed / 30 + this.transform.position.x, this.transform.position.y, 0);
             this.transform.position = movement;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class Shape : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class Shape : MonoBehaviour
     public GameObject explosion;
     public float gravity;
     float ExplosionTimer = 0.1f;
+    public float explosionRadius = 2f; // Радиус взрыва
+    public Tilemap tilemap; // Ссылка на Tilemap
+
 
     Vector3 diff;
     Vector3 LastPos;
@@ -37,25 +41,43 @@ public class Shape : MonoBehaviour
     {
         if (collision.gameObject.tag == "Finish" || collision.gameObject.tag == "Dirt")
         {
-            //explos.gameObject.SetActive(true);
             lifeTime = 0f;
-            var exp = Instantiate(explos, this.transform.position, Quaternion.Euler(0f, 0f, 0f));
-            var p = Instantiate(explosion, this.transform.position, Quaternion.Euler(0f, 0f, 0f)) as GameObject;
+
+            // Создаем эффект взрыва
+            var p = Instantiate(explosion, this.transform.position, Quaternion.identity) as GameObject;
             p.GetComponent<ParticleSystem>().Play();
             Destroy(p, p.GetComponent<ParticleSystem>().main.duration);
-            //Destroy(exp);
-            //explos.gameObject.SetActive(false);
-            //speed = new Vector3(speed.x, -speed.y, 0);
+
+            // Удаляем тайлы в радиусе взрыва
+            RemoveTilesInRadius(this.transform.position, explosionRadius);
+
         }
-        if (collision.gameObject.tag == "Player")
+
+        
+
+    }
+    void RemoveTilesInRadius(Vector3 explosionPosition, float radius)
+    {
+        // Преобразуем координаты мира в координаты Tilemap
+        Vector3Int centerCell = tilemap.WorldToCell(explosionPosition);
+
+        // Определяем радиус в тайлах
+        int radiusInTiles = Mathf.CeilToInt(radius);
+
+        // Перебираем все тайлы в квадрате вокруг центра
+        for (int x = -radiusInTiles; x <= radiusInTiles; x++)
         {
-            if(ExplosionTimer <= 0f)
+            for (int y = -radiusInTiles; y <= radiusInTiles; y++)
             {
-                lifeTime = 0f;
-                var exp = Instantiate(explos, this.transform.position, Quaternion.Euler(0f, 0f, 0f));
-                var p = Instantiate(explosion, this.transform.position, Quaternion.Euler(0f, 0f, 0f)) as GameObject;
-                p.GetComponent<ParticleSystem>().Play();
-                Destroy(p, p.GetComponent<ParticleSystem>().main.duration);
+                Vector3Int cellPosition = new Vector3Int(centerCell.x + x, centerCell.y + y, 0);
+
+                // Проверяем, попадает ли текущий тайл в радиус взрыва
+                Vector3 worldPosition = tilemap.CellToWorld(cellPosition);
+                if (Vector3.Distance(worldPosition, explosionPosition) <= radius)
+                {
+                    // Удаляем тайл
+                    tilemap.SetTile(cellPosition, null);
+                }
             }
         }
     }
