@@ -16,10 +16,11 @@ public class HeroMove : MonoBehaviour
     public GameObject GameOverPanel;
     public Slider Fuel;
     bool isOver = false;
+    [SerializeField] private bool InfFuel = false;
 
     public void Move()
     {
-        if (power >= 0)
+        if (power >= 0 || InfFuel)
         {
             float moveHorizontal = Input.GetAxis("Horizontal");
             if (moveHorizontal * _moveSpeed > 0)
@@ -34,10 +35,10 @@ public class HeroMove : MonoBehaviour
 
     public void Ratation()
     {
-            Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-            diff.Normalize();
+        Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        diff.Normalize();
 
-            Connon.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg);
+        Connon.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg);
         //float AngleRotate = Input.GetAxis("Mouse X");
         //Tower.transform.Rotate(0, 0, AngleRotate);
     }
@@ -57,7 +58,7 @@ public class HeroMove : MonoBehaviour
                 HetDamage = false;
                 if (HP <= 0)
                 {
-                    
+
                     //GetComponent<ControllerPlayr>().Destr(this.);
                     //GetComponent<ControllerPlayr>().Players.Remove(this.gameObject);
                     Destroy(this.gameObject);
