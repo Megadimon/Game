@@ -93,13 +93,4 @@ public class Shape : MonoBehaviour
         // Обновляем Tilemap
         tilemap.RefreshAllTiles();
     }
-
-
-
-
-
-
-
-
-
 }
