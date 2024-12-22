@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class HeroMove : MonoBehaviour
 {
-    [SerializeField] private bool PowerOfTankUnlim = false;
 
     public float _moveSpeed;
     public int HP;
@@ -17,28 +16,29 @@ public class HeroMove : MonoBehaviour
     public GameObject GameOverPanel;
     public Slider Fuel;
     bool isOver = false;
+    [SerializeField] private bool InfFuel = false;
 
     public void Move()
     {
-        if (power >= 0 || PowerOfTankUnlim)
+        if (power >= 0 || InfFuel)
         {
-            float moveHorizontal = Input.GetAxisRaw("Horizontal");
+            float moveHorizontal = Input.GetAxis("Horizontal");
             if (moveHorizontal * _moveSpeed > 0)
                 power = power - moveHorizontal * _moveSpeed;
             else
                 power = power + moveHorizontal * _moveSpeed;
             Fuel.value = power;
-            var movement = new Vector3(moveHorizontal * _moveSpeed / 30 + this.transform.position.x, this.transform.position.y, 0);
+            var movement = new Vector3(moveHorizontal * _moveSpeed + this.transform.position.x, this.transform.position.y, 0);
             this.transform.position = movement;
         }
     }
 
     public void Ratation()
     {
-            Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-            diff.Normalize();
+        Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        diff.Normalize();
 
-            Connon.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg);
+        Connon.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg);
         //float AngleRotate = Input.GetAxis("Mouse X");
         //Tower.transform.Rotate(0, 0, AngleRotate);
     }
@@ -58,7 +58,7 @@ public class HeroMove : MonoBehaviour
                 HetDamage = false;
                 if (HP <= 0)
                 {
-                    
+
                     //GetComponent<ControllerPlayr>().Destr(this.);
                     //GetComponent<ControllerPlayr>().Players.Remove(this.gameObject);
                     Destroy(this.gameObject);

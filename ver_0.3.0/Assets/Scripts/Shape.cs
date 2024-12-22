@@ -13,7 +13,7 @@ public class Shape : MonoBehaviour
     public float gravity;
     float ExplosionTimer = 0.1f;
     public float explosionRadius = 2f; // Радиус взрыва
-    public Tilemap tilemap; // Ссылка на Tilemap
+    private Tilemap tilemap; // Ссылка на Tilemap
 
 
     Vector3 diff;
@@ -21,6 +21,10 @@ public class Shape : MonoBehaviour
     // Для выстрела в сторону мыши
     // https://bunkerbook.ru/unity-lessons/kak-sdelat-strelbu-v-unity-2d/
 
+    public void Start()
+    {
+        tilemap = FindAnyObjectByType<Tilemap>();
+    }
     public bool Move()
     {
         transform.position += speed;
@@ -28,7 +32,6 @@ public class Shape : MonoBehaviour
         ExplosionTimer -= Time.deltaTime;
         diff = this.transform.position - LastPos;
         LastPos = this.transform.position;
-        //diff.Normalize();
         transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg - 90);
         if (phisic)
         {
@@ -39,24 +42,30 @@ public class Shape : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Finish" || collision.gameObject.tag == "Dirt")
+        if (collision.gameObject.CompareTag("Finish") || collision.gameObject.CompareTag("Dirt"))
         {
             lifeTime = 0f;
-
             // Создаем эффект взрыва
             var p = Instantiate(explosion, this.transform.position, Quaternion.identity) as GameObject;
             p.GetComponent<ParticleSystem>().Play();
-            Destroy(p, p.GetComponent<ParticleSystem>().main.duration);
 
             // Удаляем тайлы в радиусе взрыва
-            RemoveTilesInRadius(this.transform.position, explosionRadius);
-
+            RemoveTilesInRadius(transform.position, explosionRadius);
+            Destroy(p, p.GetComponent<ParticleSystem>().main.duration);
         }
-
-        
-
+        if (collision.gameObject.tag == "Player")
+        {
+            if (ExplosionTimer <= 0f)
+            {
+                lifeTime = 0f;
+                var exp = Instantiate(explos, this.transform.position, Quaternion.Euler(0f, 0f, 0f));
+                var p = Instantiate(explosion, this.transform.position, Quaternion.Euler(0f, 0f, 0f)) as GameObject;
+                p.GetComponent<ParticleSystem>().Play();
+                Destroy(p, p.GetComponent<ParticleSystem>().main.duration);
+            }
+        }
     }
-    void RemoveTilesInRadius(Vector3 explosionPosition, float radius)
+    private void RemoveTilesInRadius(Vector3 explosionPosition, float radius)
     {
         // Преобразуем координаты мира в координаты Tilemap
         Vector3Int centerCell = tilemap.WorldToCell(explosionPosition);
@@ -64,21 +73,33 @@ public class Shape : MonoBehaviour
         // Определяем радиус в тайлах
         int radiusInTiles = Mathf.CeilToInt(radius);
 
-        // Перебираем все тайлы в квадрате вокруг центра
+        // Проходим по области в радиусе окружности
         for (int x = -radiusInTiles; x <= radiusInTiles; x++)
         {
             for (int y = -radiusInTiles; y <= radiusInTiles; y++)
             {
-                Vector3Int cellPosition = new Vector3Int(centerCell.x + x, centerCell.y + y, 0);
-
-                // Проверяем, попадает ли текущий тайл в радиус взрыва
-                Vector3 worldPosition = tilemap.CellToWorld(cellPosition);
-                if (Vector3.Distance(worldPosition, explosionPosition) <= radius)
+                // Проверяем, находится ли клетка внутри окружности
+                if (x * x + y * y <= radiusInTiles * radiusInTiles)
                 {
-                    // Удаляем тайл
-                    tilemap.SetTile(cellPosition, null);
+                    Vector3Int cellPosition = new Vector3Int(centerCell.x + x, centerCell.y + y, 0);
+                    if (tilemap.GetTile(cellPosition) != null)
+                    {
+                        tilemap.SetTile(cellPosition, null); // Удаляем тайл
+                    }
                 }
             }
         }
+
+        // Обновляем Tilemap
+        tilemap.RefreshAllTiles();
     }
+
+
+
+
+
+
+
+
+
 }
