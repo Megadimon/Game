@@ -4,25 +4,33 @@ using UnityEngine.UI;
 public class PlayerUI : MonoBehaviour
 {
     public GameObject HPBar; // Шкала здоровья
+    public GameObject FuelBar;
     private Player _player; // Ссылка на игрока
-    private Image _fillImage; // Компонент изображения для заполнения шкалы
+    private Image _fillHPBar;
+    private Image _fillFuelBar;
 
     private void Start()
     {
         _player = GetComponent<Player>();
         if (HPBar != null)
         {
-            _fillImage = HPBar.transform.Find("Fill").GetComponent<Image>();
+            _fillHPBar = HPBar.transform.Find("Fill").GetComponent<Image>();
+        }
+        if (FuelBar != null)
+        {
+            _fillFuelBar = FuelBar.transform.Find("Fill").GetComponent<Image>();
         }
     }
 
     private void Update()
     {
-        if (_fillImage != null)
+        if (_fillHPBar != null)
         {
-            // Обновить шкалу здоровья в зависимости от текущего здоровья игрока
-            float _currentFillAmount = Mathf.MoveTowards(_fillImage.fillAmount, Mathf.Clamp01(_player._currentHealth / _player.Health), Time.deltaTime / 2);
-            _fillImage.fillAmount = _currentFillAmount;
+            _fillHPBar.fillAmount = Mathf.MoveTowards(_fillHPBar.fillAmount, Mathf.Clamp01(_player._currentHealth / _player.Health), Time.deltaTime / 2);
+        }
+        if (_fillFuelBar != null)
+        {
+            _fillFuelBar.fillAmount = Mathf.MoveTowards(_fillFuelBar.fillAmount, Mathf.Clamp01(_player._currentFuel / _player.FuelOfPlayer), Time.deltaTime / 2);
         }
     }
 }
