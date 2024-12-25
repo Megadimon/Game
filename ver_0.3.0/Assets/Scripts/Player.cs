@@ -9,19 +9,31 @@ public class Player : APlayer
 
     [Header("Параметры Танка")]
     [SerializeField] private float _currentSpeed = 0;
+    public float _currentFuel = 0; // эти две строчки внесены, что бы понимать разницу между максимальным значением Fuel и Health
+    public float _currentHealth = 0; // и возможность вносить изменения в параматры существующих танков
     [SerializeField] private float _fuelRate = 1;
     [SerializeField] private float _speedOfRotation = 15;
     [SerializeField] private float _minAngle = 10f; 
-    [SerializeField] private float _maxAngle = 170f; 
+    [SerializeField] private float _maxAngle = 170f;
 
     private void Start()
     {
         FuelOfPlayer = 100;
-        Health = 100;
+        Health = 300;
         Speed = 2;
+        _currentHealth = Health;
+        _currentFuel = FuelOfPlayer;
+
     }
     private void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            _currentHealth -= 20;
+        }
+
+
         PlayerMove();
         RotationWeapon();
     }

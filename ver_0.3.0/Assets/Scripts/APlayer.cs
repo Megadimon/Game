@@ -8,7 +8,7 @@ public abstract class APlayer : MonoBehaviour
     private float _speedOfPlayer;
     private float _fuelOfPlayer;
     public GameObject Cannon; // добавил пушку, так как у каждого танка должна быть пушка, хз как присваивать ее но да похуй
-    public Slider _hpBar;
+    public GameObject _hpBar;
     public Slider _fuelBar;
     public bool _isYouTurn;
 
