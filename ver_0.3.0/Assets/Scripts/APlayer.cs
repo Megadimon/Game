@@ -7,13 +7,26 @@ public abstract class APlayer : MonoBehaviour
     private int _healthOfPlayer;
     private float _speedOfPlayer;
     private float _fuelOfPlayer;
+    public GameObject Cannon; // добавил пушку, так как у каждого танка должна быть пушка, хз как присваивать ее но да похуй
     public Slider _hpBar;
     public Slider _fuelBar;
     public bool _isYouTurn;
 
-    public abstract int HealthSetup { get; set; }
-    public abstract int SpeedSetup { get; set; }
-    public abstract int FuelOfPlayerSetup { get; set; }
+    public virtual int Health
+    {
+        get { return _healthOfPlayer; }
+        set { _healthOfPlayer = value; }
+    }
+    public virtual float Speed
+    {
+        get { return _speedOfPlayer; }
+        set { _speedOfPlayer = value; }
+    }
+    public virtual float FuelOfPlayer
+    {
+        get { return _fuelOfPlayer; }
+        set { _fuelOfPlayer = value; }
+    }
 
     public abstract void PlayerMove();
     public abstract void PlayerShot();

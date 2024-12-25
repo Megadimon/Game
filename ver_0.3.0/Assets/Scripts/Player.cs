@@ -4,16 +4,46 @@ using UnityEngine;
 
 public class Player : APlayer
 {
+    [Header("Инструменты Разработчика")]
+    [SerializeField] private bool _infiniteFuel;
 
+    [Header("Параметры Танка")]
+    [SerializeField] private float _currentSpeed = 0;
+    [SerializeField] private float _fuelRate = 1;
+    [SerializeField] private float _speedOfRotation = 15;
+    [SerializeField] private float _minAngle = 10f; 
+    [SerializeField] private float _maxAngle = 170f; 
+
+    private void Start()
+    {
+        FuelOfPlayer = 100;
+        Health = 100;
+        Speed = 2;
+    }
+    private void Update()
+    {
+        PlayerMove();
+        RotationWeapon();
+    }
     public override void PlayerMove() 
-    { 
+    {
+        if (FuelOfPlayer >= 0 || _infiniteFuel )
+        {
+            float x = Input.GetAxisRaw("Horizontal");
+            
+            _currentSpeed = Mathf.Lerp(_currentSpeed, x * Speed, Time.fixedDeltaTime / 2); 
+            // ссылки на разные функции по типу Lerp https://gamedevbeginner.com/the-right-way-to-lerp-in-unity-with-examples/
+            if (x == 0 && Mathf.Abs(_currentSpeed) < 0.1f) // о боги я писал это условие 3 часа
+            { 
+                _currentSpeed = 0; 
+            }
 
-
-
+            GetComponent<Rigidbody2D>().velocity = new Vector2(_currentSpeed, GetComponent<Rigidbody2D>().velocity.y);
+            FuelOfPlayer -= _fuelRate * Time.deltaTime; // Время для плавного расхода топлива
+        }
     }
     public override void PlayerShot()
     {
-        
 
 
     }
@@ -25,9 +55,14 @@ public class Player : APlayer
     }
     public override void RotationWeapon()
     {
-
-
-
+        float input = Input.GetAxis("Vertical");
+        // Рассчитываем новый угол с ограничением
+        float newAngle = Mathf.Clamp(
+            Cannon.transform.localEulerAngles.z + input * _speedOfRotation * Time.fixedDeltaTime,
+            _minAngle,
+            _maxAngle
+        );
+        Cannon.transform.localEulerAngles = new Vector3(Cannon.transform.localEulerAngles.x, Cannon.transform.localEulerAngles.y, newAngle);
     }
 
 }
