@@ -5,19 +5,6 @@ using UnityEngine;
 public class StandardTank : AbstractTankClass
 {
 
-    protected override Vector2 GetMovementDirection()
-    {
-        Vector2 direction = new Vector2(Input.GetAxis("Horizontal"), 0);
-        //return direction.normalized;
-        return direction;
-    }
-
-    void FixedUpdate()
-    {
-        ApplyMovement(GetMovementDirection());
-
-        Debug.Log("Direction = " + GetMovementDirection());
-    }
 
     //[SerializeField] private GameObject projectilePrefab; // Префаб снаряда
     //[SerializeField] private Transform shootingPoint;       // Точка выстрела

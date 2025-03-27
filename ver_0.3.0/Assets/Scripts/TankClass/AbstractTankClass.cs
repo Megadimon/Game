@@ -5,35 +5,21 @@ using UnityEngine.UI;
 
 public abstract class AbstractTankClass : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    [SerializeField] protected float _baseSpedd = 5f;
-    [SerializeField] protected Rigidbody2D _rb;
+    [Header("Modules")]
+    [SerializeField] protected AbstractTankMovementModule _movementModule;
 
     protected virtual void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
-
-        if(_rb == null)
-        {
-            Debug.Log("Rigidbody2D не найден для " + gameObject.name);
-        }
+        if (_movementModule == null) { _movementModule = GetComponent<StandardTankMovement>(); }
+        if (_movementModule == null) { Debug.LogError($"TankMovementModule не найден для {gameObject.name}. Добавьте модуль движения!", this);  }
+            
     }
 
-    protected virtual void ApplyMovement(Vector2 direction)
+    protected virtual void FixedUpdate()
     {
-        _rb.velocity = direction * _baseSpedd;
+        _movementModule?.ApplyMovement();
+
+        Debug.Log("Direction = " + _movementModule.GetMovementDirection());
     }
 
-    protected abstract Vector2 GetMovementDirection();
-
-    //protected float _healthOfPlayer;
-    //protected float _speedOfPlayer;
-    //public Rigidbody2D _rb;
-    //public float _moveInput;
-    //public GameObject Cannon;
-
-    //public abstract void PlayerMove();
-    //public abstract void PlayerShot();
-
-    //public abstract void RotationWeapon();
 }
